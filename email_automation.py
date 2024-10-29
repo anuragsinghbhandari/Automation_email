@@ -45,7 +45,8 @@ EMAIL = os.getenv("EMAIL")
 PASSWORD = os.getenv("EMAIL_PASSWORD")
 IMAP_SERVER = os.getenv("IMAP_SERVER")
 SMTP_SERVER = os.getenv("SMTP_SERVER")
-SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
+#SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
+SMTP_PORT = 587
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Validate environment variables
