@@ -36,10 +36,10 @@ The Gmail Automation Assistant is a web application that leverages Flask and Rea
 
 4. Create a `.env` file in the root directory and add your environment variables:
    ```plaintext
-   FLASK_SECRET_KEY=<your_secret_key>
+   GROQ_API_KEY=<your_secret_key>
    ```
 
-5. Place your `client_secret.json` file in the root directory.
+5. Place your `client_secret.json` file in the root directory. **Note - Rename the credentials file to client_secret.json**
 
 6. Run the backend:
    ```bash
