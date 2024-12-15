@@ -13,26 +13,26 @@ The Gmail Automation Assistant is a web application that leverages Flask and Rea
 - Python 3.8+
 - Node.js (for the frontend)
 - A Google Cloud project with Gmail API enabled and OAuth2 credentials set up.
-     -- go to console.cloud.google.com
-     -- login then click on select project in top left
-     -- click on new project and create a new project
-     -- Now select the created project
-     -- In navigation menu, hover over apis & services and click on library.
-     -- search and enable gmail api
-     -- in navigation menu, hover over apis & services and click on Oauth consent screen.
-     -- select user type external and then create
-     -- then add app name , contact support email and developer contact email click on save and continue
-     -- in scopes no change , just save and continue
-     -- in test users , add users email who will test your app
-     -- save and click on go to dashboard
-     -- Now in credentials section click on create credentials and select oauth client id
-     -- App type as web application, in authorised redirect uri add http://localhost:5000/auth/oauth2callback and save
-     -- pop up will apear anc click on download json and save it as client_secret.json in root directory
+-- Go to console.cloud.google.com.
+-- Login then click on select project in top left.
+-- Click on new project and create a new project.
+-- Now select the created project.
+-- In navigation menu, hover over apis & services and click on library.
+-- Search and enable gmail api.
+-- In navigation menu, hover over apis & services and click on Oauth consent screen.
+-- Select user type external and then create.
+-- Then add app name , contact support email and developer contact email click on save and continue.
+-- In scopes no change , just save and continue.
+-- In test users , add users email who will test your app.
+-- Save and click on go to dashboard.
+-- Now in credentials section click on create credentials and select oauth client id.
+-- App type as web application, in authorised redirect uri add http://localhost:5000/auth/oauth2callback and save.
+-- Pop up will apear anc click on download json and save it as client_secret.json in root directory.
 - GROQ_API_KEY.
-     -- Go to console.groq.com/keys
-     -- Create Api key and save this in .env file in root folder
-     -- format (GROQ_API_KEY = PASTE KEY HERE)
-  
+-- Go to console.groq.com/keys.
+-- Create Api key and save this in .env file in root folder.
+-- Format (GROQ_API_KEY = PASTE KEY HERE).
+
 ## Installation
 
 ### Backend
