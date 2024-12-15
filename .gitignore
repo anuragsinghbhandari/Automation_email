@@ -11,3 +11,4 @@ token.json
 #folder not to include
 chroma_db
 __pycache__
+knowledge_base
