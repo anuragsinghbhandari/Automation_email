@@ -26,7 +26,7 @@ The Gmail Automation Assistant is a web application that leverages Flask and Rea
    - In test users , add users email who will test your app.
    - Save and click on go to dashboard.
    - Now in credentials section click on create credentials and select oauth client id.
-   - App type as web application, in authorised redirect uri add http://localhost:5000/auth/oauth2callback and save.
+   - App type as web application, in authorised redirect uri add http://localhost:5000/oauth2callback and save.
    - Pop up will apear anc click on download json and save it as client_secret.json in root directory.
 - GROQ_API_KEY.
    - Go to console.groq.com/keys.
