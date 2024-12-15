@@ -9,4 +9,9 @@ langchain-community
 langchain-groq
 requests
 pypdf
+torch
+torchvision
+torchaudio
 sentence-transformers
+chromadb
+tokenizers==0.21
