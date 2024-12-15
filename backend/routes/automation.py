@@ -30,7 +30,7 @@ def start_automation():
     print(2)
     with open('token.json', 'r') as token:
             data = json.load(token)
-    print(data)
+    print("Starting Email Monitoring")
     # New logic to read unseen emails
     gmail_service = GmailService.build_service(data)  # Assuming credentials are stored in session
 
@@ -41,10 +41,8 @@ def start_automation():
 
     while True:
         unread_messages_id = GmailService.get_unread_messageid(gmail_service,latest_message_id)
-        print(unread_messages_id)
         email_data = gmail_service.users().messages().get(userId='me',id= unread_messages_id).execute()
-        print(type(email_data))
-        print(email_data)
+        print(f"Email Recieved id: {unread_messages_id}")
         payload = email_data.get('payload',{})
         headers = payload.get('headers',[])
         
@@ -66,4 +64,5 @@ def start_automation():
         # Send the reply
         GmailService.send_email(gmail_service, sender, subject, reply)
         latest_message_id = unread_messages_id
+        print(f"email sent id: {unread_messages_id}")
     return jsonify({'message': 'Automation started successfully'})
