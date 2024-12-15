@@ -38,7 +38,7 @@ The Gmail Automation Assistant is a web application that leverages Flask and Rea
 ### Backend
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/anuragsinghbhandari/Automation_email.git](https://github.com/anuragsinghbhandari/Automation_email.git)
+   git clone https://github.com/anuragsinghbhandari/Automation_email.git
    cd Automation_email
    ```
 
