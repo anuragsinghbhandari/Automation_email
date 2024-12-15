@@ -10,7 +10,7 @@ The Gmail Automation Assistant is a web application that leverages Flask and Rea
 - **User-Friendly Interface**: Built with React for a smooth user experience.
 
 ## Requirements
-- Python 3.8+
+- Python 3.8+ (python 3.10 recommended)
 - Node.js (for the frontend)
 - A Google Cloud project with Gmail API enabled and OAuth2 credentials set up.
    - Go to console.cloud.google.com.
