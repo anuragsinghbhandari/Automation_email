@@ -1,0 +1,13 @@
+node_modules
+dist
+dist-ssr
+*.local
+
+#files not to include
+client_secret.json
+token.json
+.env
+
+#folder not to include
+chroma_db
+__pycache__
