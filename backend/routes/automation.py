@@ -8,6 +8,8 @@ from ..config import FlaskConfig
 from ..routes.auth import session
 import json
 import logging
+import threading
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -15,58 +17,11 @@ automation_bp = Blueprint('automation', __name__)
 llm_service = LLMService()
 knowledge_service = KnowledgeService(llm_service.llm)
 
-##@automation_bp.route('/start', methods=['POST'])
-##def start_automation():
-##    if 'pdfs' in request.files:
-##        files = request.files.getlist('pdfs')
-##        for file in files:
-##            if file.filename:
-##                print(file.filename)
-##                filename = secure_filename(file.filename)
-##                file.save(os.path.join(FlaskConfig.UPLOAD_FOLDER, filename))
-##    print(1)
-##    Knowlegde = knowledge_service.initialize_knowledge_base()
-##
-##    print(2)
-##    with open('token.json', 'r') as token:
-##            data = json.load(token)
-##    print("Starting Email Monitoring")
-##    # New logic to read unseen emails
-##    gmail_service = GmailService.build_service(data)  # Assuming credentials are stored in session
-##
-##    results = gmail_service.users().messages().list(userId='me', maxResults=1).execute()
-##    messages = results.get('messages', [])
-##    # Extract the message ID of the latest email
-##    latest_message_id = messages[0]['id']
-##
-##    while True:
-##        unread_messages_id = GmailService.get_unread_messageid(gmail_service,latest_message_id)
-##        email_data = gmail_service.users().messages().get(userId='me',id= unread_messages_id).execute()
-##        print(f"Email Recieved id: {unread_messages_id}")
-##        payload = email_data.get('payload',{})
-##        headers = payload.get('headers',[])
-##        
-##        # Extract subject and sender
-##        subject = next(header['value'] for header in headers if header['name'] == 'Subject')
-##        sender = next(header['value'] for header in headers if header['name'] == 'From')
-##        
-##        logger.info(f"Processing email: Subject='{subject}', From={sender}")
-##        
-##        # Get the email body
-##        body = email_data['snippet']  # Use snippet for a quick response
-##        
-##        # Get relevant context from knowledge service
-##        context = knowledge_service.get_relevant_context(body)
-##
-##        # Generate a reply using LLM service
-##        reply = llm_service.generate_reply(sender, body, context)
-##
-##        # Send the reply
-##        GmailService.send_email(gmail_service, sender, subject, reply)
-##        latest_message_id = unread_messages_id
-##        print(f"email sent id: {unread_messages_id}")
-##    return jsonify({'message': 'Automation started successfully'})
-##
+# Global variables to store email details
+email_details = {
+    'received': None,
+    'sent': None
+}
 
 @automation_bp.route('/start', methods=['POST'])
 def start_automation():
@@ -77,20 +32,14 @@ def start_automation():
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(FlaskConfig.UPLOAD_FOLDER, filename))
 
-    print(1)
-    Knowlegde = knowledge_service.initialize_knowledge_base()
+    knowledge_service.initialize_knowledge_base()
 
-    print(2)
     with open('token.json', 'r') as token:
         data = json.load(token)
-    print("Starting Email Monitoring")
 
-    # Send confirmation to frontend before the infinite loop
     response = jsonify({'message': 'Automation started successfully'})
     response.status_code = 200
 
-    # Start the email monitoring in a background thread
-    import threading
     def email_monitoring():
         gmail_service = GmailService.build_service(data)
         results = gmail_service.users().messages().list(userId='me', maxResults=1).execute()
@@ -100,31 +49,32 @@ def start_automation():
         while True:
             unread_messages_id = GmailService.get_unread_messageid(gmail_service, latest_message_id)
             email_data = gmail_service.users().messages().get(userId='me', id=unread_messages_id).execute()
-            print(f"Email Received id: {unread_messages_id}")
             payload = email_data.get('payload', {})
             headers = payload.get('headers', [])
 
-            # Extract subject and sender
             subject = next(header['value'] for header in headers if header['name'] == 'Subject')
             sender = next(header['value'] for header in headers if header['name'] == 'From')
 
             logger.info(f"Processing email: Subject='{subject}', From={sender}")
 
-            # Get the email body
             body = email_data['snippet']
-
-            # Get relevant context from knowledge service
             context = knowledge_service.get_relevant_context(body)
-
-            # Generate a reply using LLM service
             reply = llm_service.generate_reply(sender, body, context)
 
-            # Send the reply
             GmailService.send_email(gmail_service, sender, subject, reply)
+
+            # Update global email details
+            email_details['received'] = f"Email Received: {subject} from {sender} at {time.strftime('%d-%m-%Y %H:%M:%S',time.localtime())}"
+            email_details['sent'] = f"Email Sent: {subject} to {sender} at {time.strftime('%d-%m-%Y %H:%M:%S',time.localtime())}"
+
             latest_message_id = unread_messages_id
-            print(f"Email sent id: {unread_messages_id}")
+            time.sleep(5)  # Polling interval
 
     thread = threading.Thread(target=email_monitoring)
     thread.start()
 
     return response
+
+@automation_bp.route('/email-status', methods=['GET'])
+def get_email_status():
+    return jsonify(email_details)
