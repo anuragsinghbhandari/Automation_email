@@ -11,7 +11,7 @@ app.config.from_object(FlaskConfig)
 # Configure CORS with specific settings
 CORS(app, supports_credentials=True, resources={
     r"/*": {
-        "origins": ["http://localhost:5173"],
+        "origins": ["http://automation-email.vercel.app"],
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type"],
         "expose_headers": ["Access-Control-Allow-Origin"],
