@@ -8,7 +8,7 @@ interface LoginButtonProps {
 const LoginButton: React.FC<LoginButtonProps> = ({ isLoading }) => {
   const handleLogin = () => {
     // Redirect to the backend login route
-    window.location.href = "http://automation-email.onrender.com/login";
+    window.location.href = "https://automation-email.onrender.com/login";
   };
 
   return (

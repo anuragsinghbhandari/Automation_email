@@ -26,7 +26,7 @@ The Gmail Automation Assistant is a web application that leverages Flask and Rea
    - In test users , add users email who will test your app.
    - Save and click on go to dashboard.
    - Now in credentials section click on create credentials and select oauth client id.
-   - App type as web application, in authorised redirect uri add http://automation-email.onrender.com/oauth2callback and save.
+   - App type as web application, in authorised redirect uri add https://automation-email.onrender.com/oauth2callback and save.
    - Pop up will apear anc click on download json and save it as client_secret.json in root directory.
 - GROQ_API_KEY.
    - Go to console.groq.com/keys.
@@ -88,7 +88,7 @@ The Gmail Automation Assistant is a web application that leverages Flask and Rea
    ```
    Frontend will run at automation-email.vercel.app
 ## Usage
-- Access the application `http://automation-email.vercel.app` in browser for the frontend.
+- Access the application `https://automation-email.vercel.app` in browser for the frontend.
 - Follow the prompts to log in and start using the automation features.
 
 ### Authentication

@@ -14,7 +14,7 @@ const AutomationStatus: React.FC<AutomationStatusProps> = ({ onStart }) => {
 
   const fetchEmailStatus = async () => {
     try {
-      const response = await axios.get('http://automation-email.onrender.com/email-status');
+      const response = await axios.get('https://automation-email.onrender.com/email-status');
       setEmailReceived(response.data.received);
       setEmailSent(response.data.sent);
     } catch (err) {

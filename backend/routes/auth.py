@@ -41,7 +41,7 @@ def login():
 def oauth2callback():
     try:
         if 'state' not in session:
-            return redirect('http://automation-email.vercel.app?auth=error&message=Invalid state')
+            return redirect('https://automation-email.vercel.app?auth=error&message=Invalid state')
 
         flow = Flow.from_client_secrets_file(
             CLIENT_SECRETS_FILE,
@@ -62,9 +62,9 @@ def oauth2callback():
         with open('token.json', 'w') as token:
             json.dump(credentials_to_dict(credentials), token)
             
-        return redirect('http://automation-email.vercel.app?auth=success')
+        return redirect('https://automation-email.vercel.app?auth=success')
     except Exception as e:
-        return redirect(f'http://automation-email.vercel.app?auth=error&message={str(e)}')
+        return redirect(f'https://automation-email.vercel.app?auth=error&message={str(e)}')
 
 @auth_bp.route('/auth/status')
 def auth_status():

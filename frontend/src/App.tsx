@@ -7,7 +7,7 @@ import FileUpload from './components/FileUpload';
 import AutomationStatus from './components/AutomationStatus';
 import type { AuthState, UploadState } from './types';
 
-const API_URL = 'http://automation-email.onrender.com';
+const API_URL = 'https://automation-email.onrender.com';
 
 // Configure axios defaults
 axios.defaults.withCredentials = true;
