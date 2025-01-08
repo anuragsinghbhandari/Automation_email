@@ -18,3 +18,4 @@ tokenizers==0.21
 gunicorn
 pymongo
 dnspython
+psutil
