@@ -16,3 +16,5 @@ sentence-transformers
 chromadb
 tokenizers==0.21
 gunicorn
+pymongo
+dnspython
