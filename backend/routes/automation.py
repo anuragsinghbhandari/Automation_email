@@ -10,8 +10,16 @@ import json
 import logging
 import threading
 import time
+from pymongo import MongoClient
+import gridfs
 
 logger = logging.getLogger(__name__)
+
+# MongoDB Setup
+mongo_uri = os.environ.get('MONGODB_URI')
+client = MongoClient(mongo_uri)
+db = client['your_database_name']
+fs = gridfs.GridFS(db)
 
 automation_bp = Blueprint('automation', __name__)
 llm_service = LLMService()
@@ -30,7 +38,17 @@ def start_automation():
         for file in files:
             if file.filename:
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(FlaskConfig.UPLOAD_FOLDER, filename))
+                # Store in MongoDB instead of filesystem
+                try:
+                    file_id = fs.put(
+                        file.read(),
+                        filename=filename,
+                        content_type='application/pdf'
+                    )
+                    logger.info(f"File {filename} uploaded to MongoDB with id: {file_id}")
+                except Exception as e:
+                    logger.error(f"Error uploading file {filename}: {e}")
+                    return jsonify({'error': 'File upload failed'}), 500
 
     knowledge_service.initialize_knowledge_base()
 
@@ -63,12 +81,11 @@ def start_automation():
 
             GmailService.send_email(gmail_service, sender, subject, reply)
 
-            # Update global email details
             email_details['received'] = f"Email Received: {subject} from {sender} at {time.strftime('%d-%m-%Y %H:%M:%S',time.localtime())}"
             email_details['sent'] = f"Email Sent: {subject} to {sender} at {time.strftime('%d-%m-%Y %H:%M:%S',time.localtime())}"
 
             latest_message_id = unread_messages_id
-            time.sleep(5)  # Polling interval
+            time.sleep(5)
 
     thread = threading.Thread(target=email_monitoring)
     thread.start()
