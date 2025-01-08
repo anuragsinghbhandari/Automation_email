@@ -6,23 +6,13 @@ import os
 import json
 import secrets
 
+# Create blueprint without url_prefix - we'll handle paths in the routes
 auth_bp = Blueprint('auth', __name__)
-
-def credentials_to_dict(credentials):
-    """Convert credentials to a dictionary."""
-    return {
-        'token': credentials.token,
-        'refresh_token': credentials.refresh_token,
-        'token_uri': credentials.token_uri,
-        'client_id': credentials.client_id,
-        'client_secret': credentials.client_secret,
-        'scopes': credentials.scopes
-    }
 
 @auth_bp.route('/login')
 def login():
     try:
-        # Generate a more secure state token
+        # Generate a secure state token
         state = secrets.token_urlsafe(32)
         
         flow = Flow.from_client_secrets_file(
@@ -35,16 +25,11 @@ def login():
             access_type='offline',
             include_granted_scopes='true',
             prompt='consent',
-            state=state  # Use our generated state
+            state=state
         )
 
-        # Store state in session
         session['oauth_state'] = state
         session.modified = True
-
-        # Debug print
-        print(f"Setting oauth_state in session: {state}")
-        print(f"Current session contents: {dict(session)}")
         
         return jsonify({'url': authorization_url})
     except Exception as e:
@@ -54,18 +39,10 @@ def login():
 @auth_bp.route('/oauth2callback')
 def oauth2callback():
     try:
-        # Debug print
-        print(f"Callback received. Session contents: {dict(session)}")
-        
-        # Get state from session
         stored_state = session.get('oauth_state')
         received_state = request.args.get('state')
-        
-        print(f"Stored state: {stored_state}")
-        print(f"Received state: {received_state}")
 
         if not stored_state or stored_state != received_state:
-            print("State mismatch or missing!")
             return redirect('https://automation-email.vercel.app?auth=error&message=Invalid state')
 
         flow = Flow.from_client_secrets_file(
@@ -79,11 +56,8 @@ def oauth2callback():
         flow.fetch_token(authorization_response=authorization_response)
         credentials = flow.credentials
         
-        # Store credentials in session
         session['credentials'] = credentials_to_dict(credentials)
         session.modified = True
-        
-        # Clear the oauth state
         session.pop('oauth_state', None)
             
         return redirect('https://automation-email.vercel.app?auth=success')
@@ -91,8 +65,10 @@ def oauth2callback():
         print(f"Callback error: {str(e)}")
         return redirect(f'https://automation-email.vercel.app?auth=error&message={str(e)}')
 
-@auth_bp.route('/auth/status')
+# Changed from /auth/status to /status
+@auth_bp.route('/status')
 def auth_status():
+    print("Status endpoint called")  # Debug log
     is_authenticated = False
     try:
         if 'credentials' in session:
@@ -110,3 +86,13 @@ def auth_status():
 def logout():
     session.clear()
     return jsonify({'success': True})
+
+def credentials_to_dict(credentials):
+    return {
+        'token': credentials.token,
+        'refresh_token': credentials.refresh_token,
+        'token_uri': credentials.token_uri,
+        'client_id': credentials.client_id,
+        'client_secret': credentials.client_secret,
+        'scopes': credentials.scopes
+    }
