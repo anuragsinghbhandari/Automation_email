@@ -21,7 +21,7 @@ CORS(app, supports_credentials=True, resources={
 
 # Configure session
 app.config.update(
-    SESSION_COOKIE_SECURE=False,  # Set to True in production
+    SESSION_COOKIE_SECURE=True,  # Set to True in production
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax',
     PERMANENT_SESSION_LIFETIME=1800  # 30 minutes
