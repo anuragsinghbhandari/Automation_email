@@ -8,7 +8,6 @@ import json
 auth_bp = Blueprint('auth', __name__)
 
 def credentials_to_dict(credentials):
-    """Convert credentials to a dictionary."""
     return {
         'token': credentials.token,
         'refresh_token': credentials.refresh_token,
@@ -29,24 +28,25 @@ def login():
         authorization_url, state = flow.authorization_url(
             access_type='offline',
             include_granted_scopes='true',
-            prompt='consent'  # Force consent screen to ensure refresh token
+            prompt='consent'
         )
         session['state'] = state
         session.modified = True
-        return redirect(authorization_url)
+        return jsonify({'url': authorization_url})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @auth_bp.route('/oauth2callback')
 def oauth2callback():
     try:
-        if 'state' not in session:
+        state = session.get('state')
+        if not state:
             return redirect('https://automation-email.vercel.app?auth=error&message=Invalid state')
 
         flow = Flow.from_client_secrets_file(
             CLIENT_SECRETS_FILE,
             scopes=SCOPES,
-            state=session['state'],
+            state=state,
             redirect_uri=url_for('auth.oauth2callback', _external=True)
         )
         
@@ -56,11 +56,15 @@ def oauth2callback():
         
         # Store credentials in session
         session['credentials'] = credentials_to_dict(credentials)
+        session['authenticated'] = True
         session.modified = True
 
-        # Save credentials to file
-        with open('token.json', 'w') as token:
-            json.dump(credentials_to_dict(credentials), token)
+        # Save credentials to file (optional, for backup)
+        try:
+            with open('token.json', 'w') as token:
+                json.dump(credentials_to_dict(credentials), token)
+        except Exception:
+            pass  # Ignore file saving errors
             
         return redirect('https://automation-email.vercel.app?auth=success')
     except Exception as e:
@@ -68,13 +72,16 @@ def oauth2callback():
 
 @auth_bp.route('/auth/status')
 def auth_status():
+    print("Session contents:", dict(session))  # Debug line
     is_authenticated = False
     try:
-        if 'credentials' in session:
+        if 'credentials' in session and 'authenticated' in session:
             credentials = Credentials(**session['credentials'])
-            is_authenticated = credentials.valid
-    except Exception:
+            is_authenticated = credentials.valid and session['authenticated']
+    except Exception as e:
+        print("Auth status error:", str(e))  # Debug line
         session.pop('credentials', None)
+        session.pop('authenticated', None)
         
     return jsonify({
         'isAuthenticated': is_authenticated
