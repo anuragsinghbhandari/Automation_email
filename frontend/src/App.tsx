@@ -80,7 +80,61 @@ function App() {
     }
   }, []);
 
-  // Rest of your component remains the same...
+  const handleLogout = useCallback(async () => {
+    try {
+      await axios.get(`${API_URL}/logout`);
+      setAuth({ isAuthenticated: false, isLoading: false });
+      toast.success('Logged out successfully');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      toast.error('Failed to logout');
+    }
+  }, []);
+
+  const handleFileSelect = useCallback((fileList: FileList) => {
+    setUpload(prev => ({
+      ...prev,
+      files: [...prev.files, ...Array.from(fileList)],
+    }));
+  }, []);
+
+  const handleFileRemove = useCallback((index: number) => {
+    setUpload(prev => ({
+      ...prev,
+      files: prev.files.filter((_, i) => i !== index),
+    }));
+  }, []);
+
+  const handleStartAutomation = useCallback(async () => {
+    try {
+      setUpload(prev => ({ ...prev, isUploading: true }));
+      
+      const formData = new FormData();
+      upload.files.forEach(file => {
+        formData.append('pdfs', file);
+      });
+
+      await axios.post(`${API_URL}/start`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setIsAutomationRunning(true);
+      toast.success('Automation started successfully');
+      setUpload(prev => ({ ...prev, files: [] }));
+    } catch (error) {
+      console.error('Start automation failed:', error);
+      toast.error('Failed to start automation');
+    } finally {
+      setUpload(prev => ({ ...prev, isUploading: false }));
+    }
+  }, [upload.files]);
+
+  const handleStopAutomation = useCallback(() => {
+    setIsAutomationRunning(false);
+    toast.success('Automation stopped');
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
