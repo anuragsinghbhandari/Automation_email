@@ -2,18 +2,14 @@ import React from 'react';
 import { Mail } from 'lucide-react';
 
 interface LoginButtonProps {
+  onClick: () => void;
   isLoading: boolean;
 }
 
-const LoginButton: React.FC<LoginButtonProps> = ({ isLoading }) => {
-  const handleLogin = () => {
-    // Redirect to the backend login route
-    window.location.href = "https://automation-email.onrender.com/login";
-  };
-
+const LoginButton: React.FC<LoginButtonProps> = ({ onClick, isLoading }) => {
   return (
     <button
-      onClick={handleLogin}
+      onClick={onClick}
       disabled={isLoading}
       className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50"
     >

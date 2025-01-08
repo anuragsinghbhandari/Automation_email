@@ -8,6 +8,7 @@ import json
 auth_bp = Blueprint('auth', __name__)
 
 def credentials_to_dict(credentials):
+    """Convert credentials to a dictionary."""
     return {
         'token': credentials.token,
         'refresh_token': credentials.refresh_token,
@@ -28,10 +29,11 @@ def login():
         authorization_url, state = flow.authorization_url(
             access_type='offline',
             include_granted_scopes='true',
-            prompt='consent'
+            prompt='consent'  # Force consent screen to ensure refresh token
         )
         session['state'] = state
         session.modified = True
+        # Return JSON instead of redirecting
         return jsonify({'url': authorization_url})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -39,14 +41,13 @@ def login():
 @auth_bp.route('/oauth2callback')
 def oauth2callback():
     try:
-        state = session.get('state')
-        if not state:
+        if 'state' not in session:
             return redirect('https://automation-email.vercel.app?auth=error&message=Invalid state')
 
         flow = Flow.from_client_secrets_file(
             CLIENT_SECRETS_FILE,
             scopes=SCOPES,
-            state=state,
+            state=session['state'],
             redirect_uri=url_for('auth.oauth2callback', _external=True)
         )
         
@@ -56,19 +57,12 @@ def oauth2callback():
         
         # Store credentials in session
         session['credentials'] = credentials_to_dict(credentials)
-        session['authenticated'] = True
         session.modified = True
-
-        # Save credentials to file (optional, for backup)
-        try:
-            with open('token.json', 'w') as token:
-                json.dump(credentials_to_dict(credentials), token)
-        except Exception:
-            pass  # Ignore file saving errors
             
         return redirect('https://automation-email.vercel.app?auth=success')
     except Exception as e:
         return redirect(f'https://automation-email.vercel.app?auth=error&message={str(e)}')
+
 
 @auth_bp.route('/auth/status')
 def auth_status():
