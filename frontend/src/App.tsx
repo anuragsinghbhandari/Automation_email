@@ -5,7 +5,7 @@ import Header from './components/Header';
 import LoginButton from './components/LoginButton';
 import FileUpload from './components/FileUpload';
 import AutomationStatus from './components/AutomationStatus';
-import type { AuthState, UploadState } from './types';
+import type { AuthState, UploadState } from './index';
 
 const API_URL = 'https://automation-email.onrender.com';
 
@@ -27,7 +27,9 @@ function App() {
 
   const checkAuth = useCallback(async () => {
     try {
+      console.log('Checking auth status...'); // Debug log
       const response = await axios.get(`${API_URL}/auth/status`);
+      console.log('Auth response:', response.data); // Debug log
       setAuth({
         isAuthenticated: response.data.isAuthenticated,
         isLoading: false,
@@ -72,9 +74,12 @@ function App() {
   const handleLogin = useCallback(async () => {
     try {
       setAuth(prev => ({ ...prev, isLoading: true }));
-      const response = await axios.get(`${API_URL}/login`);
+      console.log('Initiating login...'); // Debug log
+      const response = await axios.get(`${API_URL}/auth/login`);
+      console.log('Login response:', response.data); // Debug log
       window.location.href = response.data.url;
     } catch (error) {
+      console.error('Login failed:', error); // Debug log
       toast.error('Failed to initialize login');
       setAuth(prev => ({ ...prev, isLoading: false }));
     }
@@ -82,7 +87,7 @@ function App() {
 
   const handleLogout = useCallback(async () => {
     try {
-      await axios.get(`${API_URL}/logout`);
+      await axios.get(`${API_URL}/auth/logout`);
       setAuth({ isAuthenticated: false, isLoading: false });
       toast.success('Logged out successfully');
     } catch (error) {
@@ -114,7 +119,7 @@ function App() {
         formData.append('pdfs', file);
       });
 
-      await axios.post(`${API_URL}/start`, formData, {
+      await axios.post(`${API_URL}/automation/start`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
